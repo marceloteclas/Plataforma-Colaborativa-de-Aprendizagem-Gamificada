@@ -74,11 +74,19 @@ Dentro da pasta src/, execute:
  ```
   bashjavac app/MainConsole.java
  ```
+ ou
+  ```
+  javac -d out src\infra\*.java src\usuarios\*.java src\desafios\*.java src\historico\*.java src\app\*.java
+  ```
 2. Rodar
 
  ```
   java app.MainConsole
  ```
+ ou
+  ```
+  java -cp out app.MainConsole
+  ```
    
 
 

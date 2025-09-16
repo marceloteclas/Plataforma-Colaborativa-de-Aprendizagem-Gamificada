@@ -1,7 +1,9 @@
 package app;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import desafios.Desafio;
@@ -10,6 +12,9 @@ import infra.Sessao;
 import usuarios.IUsuarioRepositorio;
 import usuarios.UsuarioRepositorioMemoria;
 import usuarios.UsuarioService;
+import historico.HistoricoDeComandos;
+import historico.ResponderDesafioCommand;
+
 
 public class MainConsole {
     private static Scanner scanner = new Scanner(System.in);
@@ -19,6 +24,8 @@ public class MainConsole {
         Sessao sessao = Sessao.getInstancia();
         UsuarioService usuarioService = new UsuarioService(repositorio, sessao);
         desafios.DesafioRepositorioMemoria desafioRepositorio = new desafios.DesafioRepositorioMemoria();
+        Map<String, HistoricoDeComandos> historicosPorUsuario = new HashMap<>();
+
         int opcao;
         do {
             limparTela();
@@ -29,6 +36,8 @@ public class MainConsole {
             System.out.println("4 - Logout");
             System.out.println("5 - Criar desafio");
             System.out.println("6 - Responder desafio");
+            System.out.println("7 - Desfazer última ação");
+            System.out.println("8 - Ver histórico de ações");
             System.out.println("0 - Sair");
             System.out.print("Escolha uma opção: ");
             opcao = Integer.parseInt(scanner.nextLine());
@@ -175,12 +184,51 @@ public class MainConsole {
 
                     int pontuacao = desafioSelecionado.getEstrategiaPontuacao()
                         .calcularPontuacao(desafioSelecionado, acertos, tempoRespostaSegundos);
+                    String nomeUsuario = sessao.getUsuarioAtual().getNome();
+                    HistoricoDeComandos historico = historicosPorUsuario.computeIfAbsent(nomeUsuario, k -> new HistoricoDeComandos());
 
+                    ResponderDesafioCommand comando = new ResponderDesafioCommand(desafioSelecionado, pontuacao, sessao);
+                    historico.executarComando(comando);
 
 
                     System.out.println("Você acertou " + acertos + " de " + desafioSelecionado.getPerguntas().size()
                             + " perguntas.");
                     System.out.println("Sua pontuação: " + pontuacao);
+                    System.out.println("\nPressione Enter para continuar...");
+                    scanner.nextLine();
+                    break;
+                case 7:
+                    limparTela();
+                    String nomeUsuarioAtual = sessao.getUsuarioAtual().getNome();
+                    HistoricoDeComandos historicoAtual = historicosPorUsuario.get(nomeUsuarioAtual);
+
+                    if (historicoAtual != null) {
+                        historicoAtual.desfazerUltimo();
+                    } else {
+                        System.out.println("Nenhuma ação registrada para este usuário.");
+                    }
+                    System.out.println("\nPressione Enter para continuar...");
+                    scanner.nextLine();
+                    break;
+
+                case 8:
+                    limparTela();
+                    if (sessao.getUsuarioAtual() == null) {
+                        System.out.println("Você precisa estar logado para ver o histórico.");
+                        System.out.println("\nPressione Enter para continuar...");
+                        scanner.nextLine();
+                        break;
+                    }
+
+                    String nomeUsuario2 = sessao.getUsuarioAtual().getNome();
+                    HistoricoDeComandos historico2 = historicosPorUsuario.get(nomeUsuario2);
+
+                    if (historico2 != null) {
+                        historico2.mostrarHistorico();
+                    } else {
+                        System.out.println("Nenhuma ação registrada para este usuário.");
+                    }
+
                     System.out.println("\nPressione Enter para continuar...");
                     scanner.nextLine();
                     break;

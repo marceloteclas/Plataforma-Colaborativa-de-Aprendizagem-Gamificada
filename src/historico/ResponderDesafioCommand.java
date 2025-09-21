@@ -27,4 +27,9 @@ public class ResponderDesafioCommand implements Comando {
         sessao.getUsuarioAtual().setPontuacao(pontuacaoAnterior);
         System.out.println("Pontuação revertida.");
     }
+
+    @Override
+    public String descricao() {
+        return "Respondeu desafio: '" + desafio.getTitulo() + "' com pontuação: " + novaPontuacao;
+    }
 }

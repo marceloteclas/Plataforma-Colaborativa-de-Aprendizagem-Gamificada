@@ -1,5 +1,7 @@
 package desafios;
 
+import conquistas.Conquista;
+
 public interface ConquistaObserver {
-    void notificar(String mensagem);
+    void notificarConquista(String usuario, Conquista conquista);
 }

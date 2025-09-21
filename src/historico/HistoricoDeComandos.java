@@ -25,7 +25,7 @@ public class HistoricoDeComandos {
         } else {
             System.out.println("Histórico de ações:");
             for (Comando c : comandos) {
-                System.out.println("- " + c.getClass().getSimpleName());
+                System.out.println("- " + c.descricao());
             }
         }
     }

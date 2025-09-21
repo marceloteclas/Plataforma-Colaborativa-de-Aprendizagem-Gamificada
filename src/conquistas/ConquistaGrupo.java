@@ -30,7 +30,18 @@ public class ConquistaGrupo implements Conquista {
     public String getDescricao() {
         return descricao;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConquistaGrupo grupo = (ConquistaGrupo) o;
+        return nome.equals(grupo.nome) && descricao.equals(grupo.descricao);
+    }
 
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(nome, descricao);
+    }
     @Override
     public String toString() {
         return "Grupo: " + nome + " -> " + conquistas.toString();

@@ -76,8 +76,8 @@ Dentro da pasta src/, execute:
  ```
  ou
   ```
-  javac -d out src/conquistas/*.java src/app/*.java src/desafios/*.java src/usuarios/*.java src/infra/*.java src/historico/*.java
-  ```
+  javac -d out src/conquistas/*.java src/conquistas_reestruturadas/*.java src/app/*.java src/desafios/*.java src/usuarios/*.java src/infra/*.java src/historico/*.java 
+   ```
 2. Rodar
 
  ```

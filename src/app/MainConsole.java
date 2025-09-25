@@ -8,23 +8,23 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import conquistas.GerenciadorConquistas;
+import conquistas_reestruturadas.Conquista;
+import conquistas_reestruturadas.ConquistaDesafio1;
+import conquistas_reestruturadas.ConquistaPontuacaoAlta;
+import conquistas_reestruturadas.ConquistaX10;
+import conquistas_reestruturadas.ConquistaX15;
+import conquistas_reestruturadas.ConquistaX5;
+import conquistas_reestruturadas.GerenciadorConquistas;
+import conquistas_reestruturadas.MedalhaSimples;
 import desafios.Desafio;
-import desafios.NotificadorConsole;
 import desafios.PontuacaoStrategy;
+import historico.HistoricoDeComandos;
+import historico.HistoricoDeConquistas;
+import historico.ResponderDesafioCommand;
 import infra.Sessao;
 import usuarios.IUsuarioRepositorio;
 import usuarios.UsuarioRepositorioMemoria;
 import usuarios.UsuarioService;
-import historico.HistoricoDeComandos;
-import historico.ResponderDesafioCommand;
-import conquistas.Conquista;
-import conquistas.Medalha;
-import conquistas.ConquistaBrilhante;
-import conquistas.Nivel;
-import conquistas.MedalhaComposite;
-import conquistas.ConquistaGrupo;
-
 
 public class MainConsole {
     private static Scanner scanner = new Scanner(System.in);
@@ -36,10 +36,14 @@ public class MainConsole {
         desafios.DesafioRepositorioMemoria desafioRepositorio = new desafios.DesafioRepositorioMemoria();
         Map<String, HistoricoDeComandos> historicosPorUsuario = new HashMap<>();
         GerenciadorConquistas gerenciadorConquistas = new GerenciadorConquistas();
-        gerenciadorConquistas.adicionarObservador(new NotificadorConsole());
-        Map<String, Integer> desafiosRespondidosPorUsuario = new HashMap<>();         
+        Map<String, Integer> desafiosRespondidosPorUsuario = new HashMap<>();
         Map<String, Set<Conquista>> conquistasPorUsuario = new HashMap<>();
+        Map<String, HistoricoDeConquistas> historicosConquistasPorUsuario = new HashMap<>();
 
+        gerenciadorConquistas.adicionarObservador((usuario, conquista) -> {
+            System.out.println("🏆 " + usuario + " conquistou: "
+                    + conquista.getNome() + " - " + conquista.getDescricao());
+        });
 
         int opcao;
         do {
@@ -53,6 +57,7 @@ public class MainConsole {
             System.out.println("6 - Responder desafio");
             System.out.println("7 - Desfazer última ação");
             System.out.println("8 - Ver histórico de ações");
+            System.out.println("9 - Ver histórico de conquistas");
             System.out.println("0 - Sair");
             System.out.print("Escolha uma opção: ");
             opcao = Integer.parseInt(scanner.nextLine());
@@ -140,7 +145,7 @@ public class MainConsole {
 
                     Desafio desafio = new desafios.Desafio(titulo, descricao, tipoDesafio, perguntas, respostas,
                             nivelDificuldade, estrategia);
-                    
+
                     desafioRepositorio.salvar(desafio);
                     System.out.println("Desafio criado com sucesso!");
                     System.out.println("\nPressione Enter para continuar...");
@@ -148,8 +153,8 @@ public class MainConsole {
                     break;
                 case 6:
                     limparTela();
-                    if (sessao.getUsuarioAtual() == null ||
-                        !sessao.getUsuarioAtual().getTipo().equalsIgnoreCase("Aluno")) {
+                    if (sessao.getUsuarioAtual() == null
+                            || !sessao.getUsuarioAtual().getTipo().equalsIgnoreCase("Aluno")) {
                         System.out.println("Apenas alunos podem responder desafios.");
                         System.out.println("\nPressione Enter para continuar...");
                         scanner.nextLine();
@@ -170,10 +175,9 @@ public class MainConsole {
                     }
 
                     System.out.print("Escolha o número do desafio: ");
-                    String escolhaStr = scanner.nextLine();
                     int escolha;
                     try {
-                        escolha = Integer.parseInt(escolhaStr) - 1;
+                        escolha = Integer.parseInt(scanner.nextLine()) - 1;
                     } catch (NumberFormatException e) {
                         System.out.println("Entrada inválida.");
                         System.out.println("\nPressione Enter para continuar...");
@@ -190,73 +194,76 @@ public class MainConsole {
 
                     Desafio desafioSelecionado = desafios.get(escolha);
                     long tempoInicio = System.currentTimeMillis();
-                    int acertos = 0;
 
+                    int acertos = 0;
                     for (int i = 0; i < desafioSelecionado.getPerguntas().size(); i++) {
-                        System.out.println("Pergunta: " + desafioSelecionado.getPerguntas().get(i));
-                        System.out.print("Sua resposta: ");
-                        String respostaAluno = scanner.nextLine();
-                        if (respostaAluno.equalsIgnoreCase(desafioSelecionado.getRespostas().get(i))) {
+                        System.out.println("Pergunta " + (i + 1) + ": " + desafioSelecionado.getPerguntas().get(i));
+                        String resp = scanner.nextLine();
+                        if (resp.equalsIgnoreCase(desafioSelecionado.getRespostas().get(i))) {
                             acertos++;
                         }
                     }
 
                     long tempoFim = System.currentTimeMillis();
-                    long tempoRespostaSegundos = (tempoFim - tempoInicio) / 1000;
+                    long tempoGasto = (tempoFim - tempoInicio) / 1000;
 
-                    int pontuacao = desafioSelecionado.getEstrategiaPontuacao()
-                        .calcularPontuacao(desafioSelecionado, acertos, tempoRespostaSegundos);
+                    int pontuacaoBase = desafioSelecionado.getEstrategiaPontuacao()
+                            .calcularPontuacao(desafioSelecionado, acertos, tempoGasto);
 
-                    String nomeUsuario = sessao.getUsuarioAtual().getNome();
+                    int pontuacaoFinal = aplicarBonusPontuacao(
+                            pontuacaoBase,
+                            sessao.getUsuarioAtual().getNome(),
+                            desafiosRespondidosPorUsuario);
 
-                    HistoricoDeComandos historico = historicosPorUsuario
-                        .computeIfAbsent(nomeUsuario, k -> new HistoricoDeComandos());
+                    String nomeAluno = sessao.getUsuarioAtual().getNome();
+                    desafiosRespondidosPorUsuario.put(nomeAluno,
+                            desafiosRespondidosPorUsuario.getOrDefault(nomeAluno, 0) + 1);
 
-                    ResponderDesafioCommand comando = new ResponderDesafioCommand(desafioSelecionado, pontuacao, sessao);
-                    historico.executarComando(comando);
+                    Set<Conquista> conquistasDoUsuario = conquistasPorUsuario.getOrDefault(nomeAluno, new HashSet<>());
+                    List<Conquista> novasConquistas = avaliarConquistas(
+                            nomeAluno,
+                            pontuacaoFinal,
+                            acertos,
+                            desafioSelecionado.getPerguntas().size(),
+                            gerenciadorConquistas,
+                            desafiosRespondidosPorUsuario,
+                            conquistasPorUsuario,
+                            conquistasDoUsuario);
 
-                    System.out.println("Você acertou " + acertos + " de " +
-                        desafioSelecionado.getPerguntas().size() + " perguntas.");
-                    System.out.println("Sua pontuação: " + pontuacao);
+                    conquistasPorUsuario.put(nomeAluno, conquistasDoUsuario);
 
-                    // 🔄 Atualiza contador de desafios por usuário
-                    desafiosRespondidosPorUsuario.put(
-                        nomeUsuario,
-                        desafiosRespondidosPorUsuario.getOrDefault(nomeUsuario, 0) + 1
-                    );
-
-                    Set<Conquista> conquistasDoUsuario = conquistasPorUsuario
-                    .computeIfAbsent(nomeUsuario, k -> new HashSet<>());
-
-
-                    // Captura tamanho antes da avaliação para saber o que foi adicionado
-                    int conquistasAntes = conquistasDoUsuario.size();
-
-                    avaliarConquistas(nomeUsuario, pontuacao, acertos,
-                        desafioSelecionado.getPerguntas().size(), gerenciadorConquistas,
-                        desafiosRespondidosPorUsuario, conquistasDoUsuario);
-
-                    // 📋 Mostra todas as conquistas do usuário após avaliação
-                    if (!conquistasDoUsuario.isEmpty()) {
-                        System.out.println("\n🏅 Conquistas do usuário " + nomeUsuario + ":");
-                        for (Conquista c : conquistasDoUsuario) {
-                            System.out.println(" - " + c);
-                        }
+                    HistoricoDeConquistas historicoConquistas = historicosConquistasPorUsuario
+                            .computeIfAbsent(nomeAluno, k -> new HistoricoDeConquistas());
+                    for (Conquista conquista : novasConquistas) {
+                        historicoConquistas.registrar(conquista);
                     }
 
+                    HistoricoDeComandos historico = historicosPorUsuario
+                            .computeIfAbsent(nomeAluno, k -> new HistoricoDeComandos());
+                    ResponderDesafioCommand comando = new ResponderDesafioCommand(
+                            desafioSelecionado,
+                            pontuacaoFinal,
+                            sessao);
+                    historico.executarComando(comando);
+
+                    System.out.println("Você acertou " + acertos + " de " + desafioSelecionado.getPerguntas().size());
+                    System.out.println("Pontuação final: " + pontuacaoFinal);
                     System.out.println("\nPressione Enter para continuar...");
                     scanner.nextLine();
                     break;
 
                 case 7:
                     limparTela();
-                    String nomeUsuarioAtual = sessao.getUsuarioAtual().getNome();
-                    HistoricoDeComandos historicoAtual = historicosPorUsuario.get(nomeUsuarioAtual);
-
-                    if (historicoAtual != null) {
-                        historicoAtual.desfazerUltimo();
+                    if (sessao.getUsuarioAtual() != null) {
+                        String nomeUsuarioAtual = sessao.getUsuarioAtual().getNome();
+                        HistoricoDeComandos historicoAtual = historicosPorUsuario.get(nomeUsuarioAtual);
+                        if (historicoAtual != null) {
+                            historicoAtual.desfazerUltimo();
+                        } else {
+                            System.out.println("Nenhuma ação registrada para este usuário.");
+                        }
                     } else {
-                        System.out.println("Nenhuma ação registrada para este usuário.");
+                        System.out.println("Faça login para desfazer ações.");
                     }
                     System.out.println("\nPressione Enter para continuar...");
                     scanner.nextLine();
@@ -283,6 +290,28 @@ public class MainConsole {
                     System.out.println("\nPressione Enter para continuar...");
                     scanner.nextLine();
                     break;
+                case 9:
+                    limparTela();
+                    if (sessao.getUsuarioAtual() == null) {
+                        System.out.println("Você precisa estar logado para ver o histórico de conquistas.");
+                        System.out.println("\nPressione Enter para continuar...");
+                        scanner.nextLine();
+                        break;
+                    }
+
+                    String nomeUsuario3 = sessao.getUsuarioAtual().getNome();
+                    HistoricoDeConquistas historicoConquistasUsuario = historicosConquistasPorUsuario
+                            .get(nomeUsuario3);
+
+                    if (historicoConquistasUsuario != null) {
+                        historicoConquistasUsuario.mostrarHistorico();
+                    } else {
+                        System.out.println("Nenhuma conquista desbloqueada ainda.");
+                    }
+
+                    System.out.println("\nPressione Enter para continuar...");
+                    scanner.nextLine();
+                    break;
 
                 case 0:
                     limparTela();
@@ -297,62 +326,75 @@ public class MainConsole {
 
         } while (opcao != 0);
     }
-            public static void avaliarConquistas(
+
+    private static int aplicarBonusPontuacao(int pontuacaoBase, String nomeUsuario,
+            Map<String, Integer> desafiosRespondidos) {
+        int pontuacao = pontuacaoBase;
+        int totalDesafios = desafiosRespondidos.getOrDefault(nomeUsuario, 0);
+        if (totalDesafios % 3 == 0 && totalDesafios > 0) {
+            pontuacao = (int) (pontuacao * 1.20);
+            System.out.println("Bônus de streak aplicado!");
+        }
+        if (pontuacaoBase > 50) {
+            pontuacao *= 2;
+            System.out.println("Double XP ativado!");
+        }
+        return pontuacao;
+    }
+
+    public static List<Conquista> avaliarConquistas(
             String nomeUsuario,
-            int pontuacao,
+            int pontuacaoFinal,
             int acertos,
             int totalPerguntas,
             GerenciadorConquistas gerenciador,
             Map<String, Integer> desafiosRespondidosPorUsuario,
-            Set<Conquista> conquistasDoUsuario
-        ) {
-            int totalRespondidos = desafiosRespondidosPorUsuario.getOrDefault(nomeUsuario, 0);
+            Map<String, Set<Conquista>> conquistasPorUsuarioGlobal,
+            Set<Conquista> conquistasDoUsuario) {
+        int totalRespondidos = desafiosRespondidosPorUsuario.getOrDefault(nomeUsuario, 0);
+        List<Conquista> novasConquistas = new ArrayList<>();
 
-            Conquista c1 = null, c2 = null, c3 = null;
-
-            if (acertos == totalPerguntas) {
-                c1 = new ConquistaBrilhante(new Medalha("Desafio Perfeito", "Acertou todas as perguntas!"));
-            }
-
-            if (pontuacao >= 100) {
-                Medalha m = new Medalha("Pontuação Máxima", "Ganhou 100 pontos!");
-                Nivel n = new Nivel(2, "Competente");
-                ConquistaGrupo grupo = new ConquistaGrupo("Desempenho Alto", "Conquistas por pontuação");
-                grupo.adicionar(m);
-                grupo.adicionar(n);
-                c2 = grupo;
-            }
-
-            if (totalRespondidos == 1) {
-                c3 = new Medalha("Primeiro Desafio", "Completou o primeiro desafio");
-            } else if (totalRespondidos == 5) {
-                c3 = new Medalha("5 Desafios", "Concluiu 5 desafios");
-            } else if (totalRespondidos == 10) {
-                c3 = new Medalha("10 Desafios", "Concluiu 10 desafios");
-            }
-
-            if (acertos > 0) {
-                Conquista participacao = new Medalha("Participante", "Respondeu pelo menos uma pergunta.");
-                gerenciador.registrarConquista(nomeUsuario, participacao);
-                conquistasDoUsuario.add(participacao);
-            }
-
-            if (c1 != null) {
-                gerenciador.registrarConquista(nomeUsuario, c1);
-                conquistasDoUsuario.add(c1);
-            }
-
-            if (c2 != null) {
-                gerenciador.registrarConquista(nomeUsuario, c2);
-                conquistasDoUsuario.add(c2);
-            }
-
-            if (c3 != null) {
-                gerenciador.registrarConquista(nomeUsuario, c3);
-                conquistasDoUsuario.add(c3);
-            }
+        if (totalRespondidos == 1 && !jaPossuiConquista(conquistasDoUsuario, "Desafio 1")) {
+            novasConquistas.add(new ConquistaDesafio1());
+        }
+        if (totalRespondidos == 5 && !jaPossuiConquista(conquistasDoUsuario, "Desafio X5")) {
+            novasConquistas.add(new ConquistaX5());
+        }
+        if (totalRespondidos == 10 && !jaPossuiConquista(conquistasDoUsuario, "Desafio X10")) {
+            novasConquistas.add(new ConquistaX10());
+        }
+        if (totalRespondidos == 15 && !jaPossuiConquista(conquistasDoUsuario, "Desafio X15")) {
+            novasConquistas.add(new ConquistaX15());
         }
 
+        // Conquista por pontuação alta
+        if (pontuacaoFinal > 100 && !jaPossuiConquista(conquistasDoUsuario, "Pontuação Alta")) {
+            novasConquistas.add(new ConquistaPontuacaoAlta());
+        }
+
+        if (acertos == totalPerguntas && totalPerguntas > 0 &&
+                !jaPossuiConquista(conquistasDoUsuario, "Desafio Perfeito")) {
+            novasConquistas.add(new MedalhaSimples("Desafio Perfeito", "Acertou todas as perguntas!"));
+        }
+
+        conquistasDoUsuario.addAll(novasConquistas);
+
+        conquistasPorUsuarioGlobal.put(nomeUsuario, conquistasDoUsuario);
+
+        for (Conquista conquista : novasConquistas) {
+            gerenciador.registrarConquista(nomeUsuario, conquista);
+        }
+
+        return novasConquistas;
+    }
+
+    private static boolean jaPossuiConquista(Set<Conquista> conquistas, String nome) {
+        for (Conquista c : conquistas) {
+            if (c.getNome().equals(nome))
+                return true;
+        }
+        return false;
+    }
 
     public static void limparTela() {
         try {

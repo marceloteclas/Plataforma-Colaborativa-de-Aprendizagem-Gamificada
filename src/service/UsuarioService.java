@@ -71,16 +71,6 @@ public class UsuarioService {
         return lista;
     }
 
-    public List<String> exportarLista(){
-        List<String> lista = new ArrayList<String>();
-
-        for (Usuarios u : repositorio.getAll()) {
-            lista.add(u.toString());
-        }
-
-        return lista;
-    }
-
     public void mostrarUsuarioLogado() {
         Usuarios usuario = sessao.getUsuarioAtual();
         if (usuario != null) {

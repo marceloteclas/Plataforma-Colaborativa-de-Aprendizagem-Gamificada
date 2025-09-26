@@ -7,7 +7,6 @@ echo   🚀 Compilando o projeto, aguarde...
 echo ============================================
 
 javac -d out src\app\*.java ^
-src\conquistas\*.java ^
 src\conquistas_reestruturadas\*.java ^
 src\controller\*.java ^
 src\desafios\*.java ^

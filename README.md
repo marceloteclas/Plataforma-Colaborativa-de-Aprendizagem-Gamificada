@@ -76,16 +76,19 @@ Dentro da pasta src/, execute:
  ```
  ou
   ```
-  chmod +x build.sh
+  .\build.bat
+
    ```
 2. Rodar
 
  ```
-  java app.MainConsole
+  java -cp out app.MainConsole
+
  ```
  ou
   ```
-  ./build.sh
+  build.bat
+
   ```
    
 

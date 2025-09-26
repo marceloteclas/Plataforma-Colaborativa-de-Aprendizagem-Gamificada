@@ -1,7 +1,6 @@
 package desafios;
 
-import conquistas.Conquista;
-
+import conquistas_reestruturadas.Conquista;
 public class NotificadorConsole implements ConquistaObserver {
 
     @Override

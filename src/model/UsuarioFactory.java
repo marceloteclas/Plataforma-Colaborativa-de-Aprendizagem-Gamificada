@@ -1,4 +1,4 @@
-package usuarios;
+package model;
 
 public class UsuarioFactory {
 

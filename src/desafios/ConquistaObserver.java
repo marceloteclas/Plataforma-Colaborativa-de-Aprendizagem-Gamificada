@@ -1,7 +1,6 @@
 package desafios;
 
-import conquistas.Conquista;
-
+import conquistas_reestruturadas.Conquista;
 public interface ConquistaObserver {
-    void notificarConquista(String usuario, conquistas.Conquista conquista);
+    void notificarConquista(String usuario, conquistas_reestruturadas.Conquista conquista);
 }

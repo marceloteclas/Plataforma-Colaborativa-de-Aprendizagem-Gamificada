@@ -1,8 +1,12 @@
-package usuarios;
+package repository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
+
+import model.Usuarios;
 
 public class UsuarioRepositorioMemoria implements IUsuarioRepositorio {
     private Map<String, Usuarios> usuarios = new HashMap<>();
@@ -16,4 +20,8 @@ public class UsuarioRepositorioMemoria implements IUsuarioRepositorio {
     public Optional<Usuarios> buscarPorNome(String nome) {
         return Optional.ofNullable(usuarios.get(nome));
     }
+    @Override
+    public List<Usuarios> getAll() {
+        return new ArrayList<>(usuarios.values()); 
+}
 }

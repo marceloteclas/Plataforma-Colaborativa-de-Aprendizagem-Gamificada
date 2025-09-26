@@ -1,4 +1,4 @@
-package usuarios;
+package model;
 
 public class Professor extends Usuarios {
     public Professor(String nome, String senha) {
@@ -8,5 +8,10 @@ public class Professor extends Usuarios {
     @Override
     public String getTipo() {
         return "Professor";
+    }
+
+    @Override
+    public String exportarDados() {
+        return "Nome: " + nome + ", Tipo: " + getTipo();
     }
 }

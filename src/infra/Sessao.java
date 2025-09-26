@@ -1,6 +1,6 @@
 package infra;
 
-import usuarios.Usuarios;
+import model.Usuarios;
 
 /**
  * Singleton: controla a sessão global do usuário logado

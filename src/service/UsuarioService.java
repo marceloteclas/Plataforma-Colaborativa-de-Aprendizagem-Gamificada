@@ -1,6 +1,12 @@
-package usuarios;
+package service;
 
+import java.util.List;
+import java.util.ArrayList;
 import infra.Sessao;
+import model.UsuarioFactory;
+import model.Usuarios;
+import repository.IUsuarioRepositorio;
+
 import java.util.Optional;
 
 /**
@@ -54,6 +60,15 @@ public class UsuarioService {
         } else {
             System.out.println("Usuário não encontrado. Cadastre-se primeiro.");
         }
+    }
+    public List<String> exportarLista(){
+        List<String> lista = new ArrayList<String>();
+
+        for (Usuarios u : repositorio.getAll()) {
+            lista.add(u.toString());
+        }
+
+        return lista;
     }
 
     public void mostrarUsuarioLogado() {

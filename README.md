@@ -76,7 +76,7 @@ Dentro da pasta src/, execute:
  ```
  ou
   ```
-  javac -d out src/conquistas/*.java src/conquistas_reestruturadas/*.java src/app/*.java src/desafios/*.java src/usuarios/*.java src/infra/*.java src/historico/*.java 
+  chmod +x build.sh
    ```
 2. Rodar
 
@@ -85,7 +85,7 @@ Dentro da pasta src/, execute:
  ```
  ou
   ```
-  java -cp out app.MainConsole
+  ./build.sh
   ```
    
 

@@ -30,4 +30,8 @@ public abstract class Usuarios {
     }
 
     public abstract String getTipo();
+
+    public String exportarDados() {
+        return "Nome: " + nome + ", Tipo: " + getTipo() + ", Pontuação: " + pontuacao;
+    }
 }

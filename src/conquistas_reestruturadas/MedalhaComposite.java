@@ -6,23 +6,23 @@ import java.util.List;
 public class MedalhaComposite implements Conquista {
     private String nome;
     private String descricao;
-    private List<Conquista> conquistas = new ArrayList<>();
+    private List<Conquista> medalhas = new ArrayList<>();
 
     public MedalhaComposite(String nome, String descricao) {
         this.nome = nome;
         this.descricao = descricao;
     }
 
-    public void adicionar(Conquista conquista) {
-        conquistas.add(conquista);
+    public void adicionar(Conquista medalha) {
+        medalhas.add(medalha);
     }
 
-    public void remover(Conquista conquista) {
-        conquistas.remove(conquista);
+    public void remover(Conquista medalha) {
+        medalhas.remove(medalha);
     }
 
-    public List<Conquista> getConquistas() {
-        return conquistas;
+    public List<Conquista> getMedalhas() {
+        return medalhas;
     }
 
     @Override
@@ -52,8 +52,8 @@ public class MedalhaComposite implements Conquista {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[Categoria: ").append(nome).append("] ").append(descricao).append("\n");
-        for (Conquista c : conquistas) {
-            sb.append("  -> ").append(c.toString()).append("\n");
+        for (Conquista m : medalhas) {
+            sb.append("  -> ").append(m.toString()).append("\n");
         }
         return sb.toString();
     }

@@ -9,4 +9,9 @@ public class Professor extends Usuarios {
     public String getTipo() {
         return "Professor";
     }
+
+    @Override
+    public String exportarDados() {
+        return "Nome: " + nome + ", Tipo: " + getTipo();
+    }
 }

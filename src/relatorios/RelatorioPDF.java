@@ -1,12 +1,6 @@
 package relatorios;
 
-/*
-    import com.openpdf.text.Document;
-    import com.openpdf.text.pdf.PdfWriter;
-*/
-
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import org.openpdf.text.*;

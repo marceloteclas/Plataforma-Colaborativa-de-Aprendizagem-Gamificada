@@ -1,5 +1,9 @@
 package usuarios;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import conquistas_reestruturadas.Conquista;
 import conquistas_reestruturadas.ConquistaComposite;
 import conquistas_reestruturadas.MedalhaComposite;
 
@@ -30,5 +34,20 @@ public class Aluno extends Usuarios {
 
     public void adicionarMedalha(MedalhaComposite medalha) {
         this.minhasMedalhas.adicionar(medalha);
+    }
+
+    public List<String> exportarDadosComConquistas() {
+        List<String> dados = new ArrayList<>();
+
+        dados.add(exportarDados());
+        dados.add(", Conquistas: \n");
+        for (Conquista conquista : minhasConquistas.getConquistas()) {
+            dados.add(conquista.toString());
+        }
+        dados.add(", Medalhas: \n");
+        for (Conquista medalha : minhasMedalhas.getMedalhas()) {
+            dados.add(medalha.toString());
+        }
+        return dados;
     }
 }

@@ -14,8 +14,8 @@ src\historico\*.java ^
 src\infra\*.java ^
 src\model\*.java ^
 src\repository\*.java ^
+src\relatorios\*.java ^
 src\service\*.java ^
-src\usuarios\*.java ^
 src\view\*.java
 
 if %errorlevel% neq 0 (

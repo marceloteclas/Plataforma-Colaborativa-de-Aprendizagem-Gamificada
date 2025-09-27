@@ -72,7 +72,7 @@ Ou
 Dentro da pasta src/, execute:
 
  ```
-  bashjavac app/MainConsole.java
+  javac app/MainConsole.java
  ```
  ou
   ```

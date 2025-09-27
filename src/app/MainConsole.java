@@ -1,15 +1,16 @@
 package app;
 
-import controller.*;
-import infra.*;
-import service.*;
-import model.*;
-import desafios.*;
 import conquistas_reestruturadas.*;
+import controller.*;
+import desafios.*;
 import historico.*;
+import infra.*;
+import model.*;
+import repository.*;
+import relatorios.*;
+import service.*;
 import service.ConquistaService;
 import view.MenuPrincipal;
-import repository.*;
 
 import java.util.*;
 
@@ -20,17 +21,19 @@ public class MainConsole {
         IUsuarioRepositorio usuarioRepo = new UsuarioRepositorioMemoria();
         DesafioRepositorioMemoria desafioRepo = new DesafioRepositorioMemoria();
         Sessao sessao = Sessao.getInstancia();
+        UsuarioService usuarioService = new UsuarioService(usuarioRepo, sessao);
+        RelatorioSistema relatorioSistema = new RelatorioSistema(usuarioService);
 
         Map<String, HistoricoDeComandos> historicosPorUsuario = new HashMap<>();
         Map<String, Integer> desafiosRespondidosPorUsuario = new HashMap<>();
         Map<String, Set<Conquista>> conquistasPorUsuario = new HashMap<>();
         Map<String, HistoricoDeConquistas> historicosConquistasPorUsuario = new HashMap<>();
         GerenciadorConquistas gerenciadorConquistas = new GerenciadorConquistas();
+        RelatorioController relatorioController = new RelatorioController(relatorioSistema, scanner, sessao);
 
         gerenciadorConquistas.adicionarObservador((usuario, conquista) -> {
             System.out.println("🏆 " + usuario + " conquistou: " + conquista.getNome() + " - " + conquista.getDescricao());
         });
-        UsuarioService usuarioService = new UsuarioService(usuarioRepo, sessao);
         DesafioService desafioService = new DesafioService(
                 desafioRepo, sessao, historicosPorUsuario,
                 desafiosRespondidosPorUsuario, conquistasPorUsuario,
@@ -85,6 +88,7 @@ public class MainConsole {
                 case 4 -> usuarioService.logout();
                 case 7 -> historicoController.desfazerUltimaAcao();
                 case 8 -> historicoController.mostrarHistoricoDeAcoes();
+                case 10 -> relatorioController.exibirMenuRelatorios();
                 case 0 -> System.out.println("Encerrando...");
                 default -> mainController.executar(opcao);
             }

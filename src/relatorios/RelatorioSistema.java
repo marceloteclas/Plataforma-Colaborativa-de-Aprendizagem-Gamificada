@@ -17,8 +17,8 @@ public class RelatorioSistema {
 
         lista.add(" Usuários Cadastrados: \n");
 
-        for (String l : service.exportarLista()){
-            lista.add(l);
+        for (String linha : service.exportarLista()){
+            lista.add(linha);
         }
 
         return lista;

@@ -17,7 +17,7 @@ public class RelatorioPDF implements RelatorioStrategy {
 
             // Título
             Font tituloFont = new Font(Font.HELVETICA, 16, Font.BOLD);
-            document.add(new Paragraph("Relatório de Desempenho", tituloFont));
+            document.add(new Paragraph("Relatório de Dados de Usuários e Desempenho", tituloFont));
             document.add(new Paragraph(" ")); // espaço em branco
 
             // Linhas de dados

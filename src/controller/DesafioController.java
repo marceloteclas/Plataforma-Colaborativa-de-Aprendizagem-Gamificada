@@ -49,8 +49,8 @@ public class DesafioController {
 
         System.out.println("Desafio criado com sucesso!");
     }
+    
     public void responderDesafio() {
-    desafioService.responderDesafio(scanner);
-}
-
+        desafioService.responderDesafio(scanner);
+    }
 }

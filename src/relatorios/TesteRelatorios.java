@@ -1,7 +1,6 @@
 package relatorios;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import adaptador.RankingGlobalAdapter;
@@ -17,13 +16,13 @@ public class TesteRelatorios {
         dados.add("Aluno: Ana - 750 pontos");
 
         // Exportar CSV
-        facade.exportar("CSV", dados, "relatorio.csv");
+        facade.gerar("CSV", dados, "relatorio.csv");
 
         // Exportar JSON
-        facade.exportar("JSON", dados, "relatorio.json");
+        facade.gerar("JSON", dados, "relatorio.json");
 
         // Exportar PDF 
-        facade.exportar("PDF", dados, "relatorio.pdf");
+        facade.gerar("PDF", dados, "relatorio.pdf");
 
         // Exportar Relatório Interno
         RankingGlobalAPI api = new RankingGlobalAPI();
@@ -32,6 +31,6 @@ public class TesteRelatorios {
 
         dados.add("\n ---- Ranking Global ---- \n");
         dados.addAll(dadosExternos);
-        facade.exportar("PDF", dados, "relatorio_completo.pdf");
+        facade.gerar("PDF", dados, "relatorio_completo.pdf");
     }
 }

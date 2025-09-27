@@ -16,6 +16,7 @@ public class MenuPrincipal {
             System.out.println("7 - Desfazer última ação");
             System.out.println("8 - Ver histórico de ações");
             System.out.println("9 - Ver histórico de conquistas");
+            System.out.println("10 - Relatórios");
             System.out.println("0 - Sair");
             System.out.print("Escolha uma opção: ");
         return Integer.parseInt(scanner.nextLine());

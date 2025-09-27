@@ -65,7 +65,7 @@ public class UsuarioService {
         List<String> lista = new ArrayList<String>();
 
         for (Usuarios u : repositorio.getAll()) {
-            lista.add(u.toString());
+            lista.add(u.exportarDados());
         }
 
         return lista;

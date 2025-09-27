@@ -9,7 +9,7 @@ public class RelatorioFacade {
         this.relatorioStrategy = strategy;
     }
 
-    public void exportar(String tipo, List<String> dados, String caminhoArquivo) {
+    public void gerar(String tipo, List<String> dados, String caminhoArquivo) {
         switch (tipo) {
             case "CSV":
                 relatorioStrategy = new RelatorioCSV();

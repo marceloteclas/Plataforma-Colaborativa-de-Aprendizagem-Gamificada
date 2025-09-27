@@ -1,0 +1,28 @@
+##Aluno responde desafio → Sistema calcula pontos → Notificação é enviada
+sequenceDiagram
+participant Aluno
+participant MenuPrincipal
+participant MainConsole
+participant DesafioController
+participant DesafioService
+participant Desafio
+participant PontuacaoStrategy
+participant ResponderDesafioCommand
+participant HistoricoDeComandos
+participant AvaliadorConquistas
+participant GerenciadorConquistas
+participant ConquistaObserver
+
+Aluno->>MenuPrincipal: escolhe opção "Responder desafio"
+MenuPrincipal->>MainConsole: retorna opção 6
+MainConsole->>DesafioController: responderDesafio()
+DesafioController->>DesafioService: responderDesafio(scanner)
+DesafioService->>Desafio: getEstrategiaPontuacao()
+Desafio->>PontuacaoStrategy: calcularPontuacao()
+DesafioService->>ResponderDesafioCommand: cria comando
+ResponderDesafioCommand->>Sessao: adicionarPontuacao()
+DesafioService->>HistoricoDeComandos: executarComando(comando)
+DesafioService->>AvaliadorConquistas: avaliarConquistas(...)
+AvaliadorConquistas->>GerenciadorConquistas: registrarConquista()
+GerenciadorConquistas->>ConquistaObserver: notificarConquista()
+ConquistaObserver-->>Aluno: exibe notificação de conquista

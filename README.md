@@ -36,33 +36,106 @@ O sistema aplica padrões de projeto (GoF) e princípios SOLID, com foco em modu
 
 ## 🏗️ Arquitetura do Sistema
  
+```
+app/
+└── MainConsole.java
+    - Ponto de entrada do sistema. Orquestra os controladores, serviços e sessão.
+
+view/
+└── MenuPrincipal.java
+    - Interface textual com o usuário. Exibe o menu principal e captura entradas.
+
+controller/
+├── MainController.java
+├── DesafioController.java
+├── HistoricoController.java
+└── RelatorioController.java
+    - Controladores que conectam a interface com os serviços e lógica de negócio.
+
+service/
+├── UsuarioService.java
+├── DesafioService.java
+└── ConquistaService.java
+    - Camada de serviços que encapsula regras de negócio.
+
+model/
+├── Usuarios.java (abstract)
+├── Aluno.java
+├── Professor.java
+├── Visitante.java
+└── UsuarioFactory.java
+    - Representação dos tipos de usuários e fábrica para instanciá-los.
+
+repository/
+├── IUsuarioRepositorio.java
+└── UsuarioRepositorioMemoria.java
+    - Persistência em memória dos dados de usuários.
+
+desafios/
+├── Desafio.java
+├── DesafioRepositorioMemoria.java
+├── PontuacaoStrategy.java (interface)
+├── PontuacaoPorTempo.java
+├── PontuacaoPorDificuldade.java
+├── PontuacaoDecorator.java
+├── PontuacaoDoubleXP.java
+├── PontuacaoStreak.java
+└── NotificadorConsole.java
+    - Lógica de desafios, estratégias de pontuação e notificações.
+
+conquistas_reestruturadas/
+├── Conquista.java (interface)
+├── GerenciadorConquistas.java
+├── ConquistaObserver.java (interface)
+├── AvaliadorConquistas.java
+├── ConquistaService.java
+├── MedalhaComposite.java
+└── ConquistaComposite.java
+    - Sistema de conquistas e medalhas, com uso de padrões como Composite e Observer.
+
+historico/
+├── Comando.java (interface)
+├── HistoricoDeComandos.java
+├── HistoricoDeConquistas.java
+└── ResponderDesafioCommand.java
+    - Registro e desfazer de ações via padrão Command.
+
+relatorios/
+├── RelatorioStrategy.java (interface)
+├── RelatorioCSV.java
+├── RelatorioJSON.java
+├── RelatorioPDF.java
+├── RelatorioFacade.java
+└── RelatorioSistema.java
+    - Geração de relatórios em CSV, JSON e PDF via Strategy e Facade.
+
+infra/
+└── Sessao.java
+    - Gerenciamento da sessão do usuário logado.
+
+adaptador/ e api_externa/
+└── RankingGlobalAdapter.java / RankingGlobalAPI.java
+    - Integração com fontes externas de dados (ex: ranking global).
+
+```
 
 
 ## ⚙️ Padrões de Projeto Utilizados
 
-De Criação
+### 🔨 Padrões de Criação
+- Singleton → Gerenciamento global da sessão do usuário (Sessao)
+- Factory Method → Instanciação de perfis de usuário (UsuarioFactory)
 
-Singleton → Controle global de sessão
+### 🧱 Padrões Estruturais
+- Decorator → Aplicação de bônus e modificadores de pontuação (PontuacaoDecorator, PontuacaoDoubleXP)
+- Composite → Organização hierárquica de conquistas e medalhas (ConquistaComposite, MedalhaComposite)
+- Facade → Geração simplificada de relatórios em múltiplos formatos (RelatorioFacade)
+- Adapter → Integração com sistemas externos de ranking (RankingGlobalAdapter)
 
-Factory Method → Criação de perfis de usuário
-
-Estruturais
-
-Decorator → Bônus de pontuação
-
-Composite → Hierarquia de medalhas
-
-Facade → Relatórios de desempenho
-
-Adapter → Integração com ranking global
-
-Comportamentais
-
-Strategy → Estratégias de pontuação
-
-Observer → Notificação de conquistas
-
-Command → Registro e undo de ações
+### 🔁 Padrões Comportamentais
+- Strategy → Estratégias de cálculo de pontuação (PontuacaoStrategy, PontuacaoPorTempo, PontuacaoPorDificuldade)
+- Observer → Notificação automática de conquistas desbloqueadas (ConquistaObserver, GerenciadorConquistas)
+- Command → Registro e reversão de ações do usuário (Comando, ResponderDesafioCommand, HistoricoDeComandos)
 
 ## 🚀 Como Executar
 
@@ -91,6 +164,9 @@ Dentro da pasta src/, execute:
 
   ```
    
+## Diagramas UML
 
+- [Diagrama de Classes](uml/Classes.mermaid)
+- [Diagrama de Sequência](uml/diagrama_sequencia.mermaid)
 
    

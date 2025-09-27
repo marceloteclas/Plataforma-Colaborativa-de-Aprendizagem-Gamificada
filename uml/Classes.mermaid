@@ -1,0 +1,163 @@
+## Diagrama de Classes com Padrões Aplicados
+classDiagram
+%% ====== MODELO DE USUÁRIOS ======
+class Usuarios {
+  -nome: String
+  -senha: String
+  -pontuacao: int
+  +getTipo()
+  +exportarDados()
+}
+Usuarios <|-- Aluno
+Usuarios <|-- Professor
+Usuarios <|-- Visitante
+
+class Aluno {
+  -minhasConquistas: ConquistaComposite
+  -minhasMedalhas: MedalhaComposite
+  +exportarDadosComConquistas()
+}
+Aluno --> ConquistaComposite
+Aluno --> MedalhaComposite
+
+class UsuarioFactory {
+  +criarUsuario(tipo, nome, senha)
+}
+UsuarioFactory --> Usuarios
+
+%% ====== REPOSITÓRIO ======
+class IUsuarioRepositorio {
+  <<interface>>
+  +salvar()
+  +buscarPorNome()
+  +getAll()
+}
+class UsuarioRepositorioMemoria {
+  -usuarios: Map
+}
+UsuarioRepositorioMemoria --> IUsuarioRepositorio
+
+%% ====== CONTROLLERS ======
+class MainController {
+  -acoes: Map<Integer, Runnable>
+  +registrarAcao()
+  +executar()
+}
+class DesafioController {
+  -desafioService: DesafioService
+  +criarDesafio()
+  +responderDesafio()
+}
+class HistoricoController {
+  -sessao: Sessao
+  +desfazerUltimaAcao()
+  +mostrarHistoricoDeAcoes()
+}
+class RelatorioController {
+  -relatorioSistema: RelatorioSistema
+  -gerador: RelatorioFacade
+  +exibirMenuRelatorios()
+}
+
+%% ====== SERVIÇOS ======
+class UsuarioService {
+  -repositorio: IUsuarioRepositorio
+  -sessao: Sessao
+  +cadastrarUsuario()
+  +login()
+  +logout()
+}
+class DesafioService {
+  -sessao: Sessao
+  -gerenciadorConquistas: GerenciadorConquistas
+  +responderDesafio()
+}
+class ConquistaService {
+  -sessao: Sessao
+  +listarConquistas()
+}
+
+%% ====== DESAFIOS ======
+class Desafio {
+  -titulo: String
+  -estrategiaPontuacao: PontuacaoStrategy
+}
+Desafio --> PontuacaoStrategy
+
+class PontuacaoStrategy {
+  <<interface>>
+  +calcularPontuacao()
+}
+class PontuacaoPorTempo
+PontuacaoPorTempo --> PontuacaoStrategy
+class PontuacaoPorDificuldade
+PontuacaoPorDificuldade --> PontuacaoStrategy
+class PontuacaoDecorator
+PontuacaoDecorator --> PontuacaoStrategy
+
+%% ====== CONQUISTAS ======
+class Conquista {
+  <<interface>>
+  +getNome()
+  +getDescricao()
+}
+class GerenciadorConquistas {
+  -observadores: List
+  +registrarConquista()
+  +adicionarObservador()
+}
+class ConquistaObserver {
+  <<interface>>
+  +notificarConquista()
+}
+GerenciadorConquistas --> ConquistaObserver
+
+%% ====== HISTÓRICO ======
+class Comando {
+  <<interface>>
+  +executar()
+  +desfazer()
+}
+class ResponderDesafioCommand
+ResponderDesafioCommand --> Comando
+ResponderDesafioCommand --> Sessao
+
+class HistoricoDeComandos {
+  -comandos: Stack
+  +executarComando()
+  +desfazerUltimo()
+}
+HistoricoDeComandos --> Comando
+
+%% ====== RELATÓRIOS ======
+class RelatorioStrategy {
+  <<interface>>
+  +gerarRelatorio()
+}
+class RelatorioCSV
+RelatorioCSV --> RelatorioStrategy
+class RelatorioJSON
+RelatorioJSON --> RelatorioStrategy
+class RelatorioPDF
+RelatorioPDF --> RelatorioStrategy
+
+class RelatorioFacade {
+  -relatorioStrategy: RelatorioStrategy
+  +gerar()
+}
+RelatorioFacade --> RelatorioStrategy
+
+%% ====== APP E VIEW ======
+class MainConsole {
+  +main()
+}
+class MenuPrincipal {
+  +exibirMenu()
+}
+MainConsole --> MenuPrincipal
+MainConsole --> MainController
+MainConsole --> UsuarioService
+MainConsole --> DesafioService
+MainConsole --> HistoricoController
+MainConsole --> RelatorioController
+MainConsole --> GerenciadorConquistas

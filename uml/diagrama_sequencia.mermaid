@@ -1,4 +1,5 @@
-##Aluno responde desafio → Sistema calcula pontos → Notificação é enviada
+## Aluno responde desafio → Sistema calcula pontos → Notificação é enviada
+```mermaid
 sequenceDiagram
 participant Aluno
 participant MenuPrincipal
@@ -26,3 +27,5 @@ DesafioService->>AvaliadorConquistas: avaliarConquistas(...)
 AvaliadorConquistas->>GerenciadorConquistas: registrarConquista()
 GerenciadorConquistas->>ConquistaObserver: notificarConquista()
 ConquistaObserver-->>Aluno: exibe notificação de conquista
+DesafioService-->>Aluno: exibe pontuação obtida
+```
